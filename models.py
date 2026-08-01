@@ -1,10 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, ForeignKey
+from sqlalchemy import Integer, String, Text, ForeignKey, DateTime
 from datetime import datetime
 
-DateTime = datetime.now()
-print(DateTime)
+#DateTime = datetime.now()
+#print(DateTime)
 
 class Base(DeclarativeBase):
     pass
@@ -17,4 +17,7 @@ class Entry(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     trigger: Mapped[str] = mapped_column(Text, nullable=False)
-    reset_info: Mapped[str] = mapped_column(Text, nullable=False)
+    reset_info: Mapped[str] = mapped_column(Text, nullable=True)
+    reset_time : Mapped[int] = mapped_column(Integer, nullable=True)
+
+

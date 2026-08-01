@@ -9,3 +9,8 @@ class EntryForm(FlaskForm):
     reset_time = IntegerField("How long it took recover?", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
+class ResolveForm(FlaskForm):
+    reset_info = TextAreaField("How did it end?", validators=[DataRequired()])
+    reset_time = IntegerField("How long it took to recover?", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+

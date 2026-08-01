@@ -1,0 +1,28 @@
+1:48 : 1 august
+why name of column has to be the same? also for db session and redirect this is first entry and theres no route to redirect 
+, i cant redirect to home , it should go soemhre else.
+
+
+6:26:: 1 aug
+models (SQLAlchemy, db.Model) represent your database table. 
+Forms (WTForms) represent what fields show up on a webpage for user input. They're related but separate concepts.
+
+
+7:55:: 1 aug
+then maybe theres logic issue as im hitting this error
+
+AttributeError: 'EntryForm' object has no attribute 'reset_info'
+
+now should i put reset info and time in entryform?
+
+no the second onw where im updating previous entries arent they brand new or 
+that null before in model suffice the requirements and i dont need them to be in entryform?
+
+
+Where does entry_id come from here? Look at the function signature: def log_entry(): — no entry_id parameter. This function never received an entry_id from anywhere;
+it's creating a brand new entry, so there's no id yet until after you commit.
+
+You actually already worked this out correctly a few turns back — after db.session.commit(), the new row's id becomes available as an attribute on the object you just created.
+ What's that object called in this function? Look at your Entry(...) call — what did you name the variable?
+
+Given that, what should replace entry_id=entry_id in that redirect line?
