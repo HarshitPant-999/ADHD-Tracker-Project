@@ -3,6 +3,16 @@ from forms import EntryForm, ResolveForm
 from models import Entry, db
 from datetime import datetime, timedelta
 
+def get_time_block(dt):
+    hour = dt.hour
+    if hour < 10:
+        return "Morning"
+    elif hour < 15:
+        return "Afternoon"
+    elif hour < 19:
+        return "Evening"
+    else:
+        return "Night"
 
 today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -42,5 +52,9 @@ def dashboard():
         Entry.timestamp >= today_start,
         Entry.timestamp < tomorrow_start
         )).scalar()
-    return render_template("history.html", crashes_today=crashes_today)
-
+    todays_entries = db.session.execute(
+    db.select(Entry).where(
+        Entry.timestamp >= today_start,
+        Entry.timestamp < tomorrow_start
+    )).scalars().all()
+    return render_template("history.html", crashes_today=crashes_today, entries=todays_entries, get_time_block=get_time_block)

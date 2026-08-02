@@ -1,18 +1,32 @@
 {% extends "base.html" %}
-{% from "bootstrap5/form.html" import render_form %}
-
 {% block content %}
 <h1 class="mb-4">Dashboard</h1>
-  <div class="row g-3">
-      <div class="col-md-4">
-          <div class="card text-center">
-              <div class="card-body">
-                  <h5 class="card-title">Crashes Today</h5>
-                  <p class="display-4">{{ crashes_today }}</p>
-              </div>
-          </div>
-      </div>
 
-    {# Add more cards here later as you build more stats #}
-  </div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Crashes Today</h5>
+                <p class="display-4">{{ crashes_today }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mb-3">Today's Entries</h3>
+{% for entry in entries %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted">{{ entry.timestamp }}
+         - {{ get_time_block(entry.timestamp) }}</h6>
+        <p class="card-text"><strong>Trigger:</strong> {{ entry.trigger }}</p>
+        {% if entry.reset_info %}
+        <p class="card-text"><strong>Reset Info:</strong> {{ entry.reset_info }}</p>
+        <p class="card-text"><strong>Reset Time:</strong> {{ entry.reset_time }} hour</p>
+        {% else %}
+        <p class="card-text text-muted"><em>Not yet resolved</em></p>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
 {% endblock %}
