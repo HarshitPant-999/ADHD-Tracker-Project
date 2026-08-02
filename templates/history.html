@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "bootstrap5/form.html" import render_form %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+  <div class="row g-3">
+      <div class="col-md-4">
+          <div class="card text-center">
+              <div class="card-body">
+                  <h5 class="card-title">Crashes Today</h5>
+                  <p class="display-4">{{ crashes_today }}</p>
+              </div>
+          </div>
+      </div>
+
+    {# Add more cards here later as you build more stats #}
+  </div>
+{% endblock %}
