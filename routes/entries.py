@@ -62,7 +62,7 @@ def dashboard():
 @entries_bp.route("/history")
 def history():
     total_entries = db.session.execute(db.select(Entry)).scalars().all()
-    total_days = {(entry.timestamp.month, entry.timestamp.day) for entry in total_entries}
+    total_days = {(entry.timestamp.year, entry.timestamp.month, entry.timestamp.day) for entry in total_entries}
     total_days_count = len(total_days)
     total_entries_count = len(total_entries)
     return render_template("history.html", entries=total_entries, total_crashes=total_entries_count, total_days=total_days_count, get_time_block=get_time_block)
