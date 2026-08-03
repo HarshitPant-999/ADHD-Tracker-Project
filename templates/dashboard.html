@@ -6,14 +6,14 @@
     <div class="col-md-4">
         <div class="card text-center">
             <div class="card-body">
-                <h5 class="card-title">Total Crashes in {{ total_days }} days</h5>
-                <p class="display-4">{{ total_crashes }}</p>
+                <h5 class="card-title">Crashes Today</h5>
+                <p class="display-4">{{ crashes_today }}</p>
             </div>
         </div>
     </div>
 </div>
 
-<h3 class="mb-3">Totals Entries</h3>
+<h3 class="mb-3">Today's Entries</h3>
 {% for entry in entries %}
 <div class="card mb-3">
     <div class="card-body">

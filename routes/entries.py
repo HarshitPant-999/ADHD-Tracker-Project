@@ -57,4 +57,14 @@ def dashboard():
         Entry.timestamp >= today_start,
         Entry.timestamp < tomorrow_start
     )).scalars().all()
-    return render_template("history.html", crashes_today=crashes_today, entries=todays_entries, get_time_block=get_time_block)
+    return render_template("dashboard.html", crashes_today=crashes_today, entries=todays_entries, get_time_block=get_time_block)
+
+@entries_bp.route("/history")
+def history():
+    total_entries = db.session.execute(db.select(Entry)).scalars().all()
+    total_days = {(entry.timestamp.month, entry.timestamp.day) for entry in total_entries}
+    total_days_count = len(total_days)
+    total_entries_count = len(total_entries)
+    return render_template("history.html", entries=total_entries, total_crashes=total_entries_count, total_days=total_days_count, get_time_block=get_time_block)
+
+
