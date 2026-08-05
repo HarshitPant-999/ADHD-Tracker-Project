@@ -19,5 +19,15 @@ class Entry(db.Model):
     trigger: Mapped[str] = mapped_column(Text, nullable=False)
     reset_info: Mapped[str] = mapped_column(Text, nullable=True)
     reset_time : Mapped[int] = mapped_column(Integer, nullable=True)
-
+    @property
+    def time_block(self):
+        hour = self.timestamp.hour
+        if hour < 10:
+            return "Morning"
+        elif hour < 15:
+            return "Afternoon"
+        elif hour < 19:
+            return "Evening"
+        else:
+            return "Night"
 

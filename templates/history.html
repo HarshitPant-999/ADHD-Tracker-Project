@@ -6,19 +6,23 @@
     <div class="col-md-4">
         <div class="card text-center">
             <div class="card-body">
-                <h5 class="card-title">Total Crashes in {{ total_days }} days</h5>
+                <h2 class="card-title">Total Crashes in {{ total_days }} days</h2>
                 <p class="display-4">{{ total_crashes }}</p>
             </div>
         </div>
     </div>
 </div>
-
+<div>
 <h3 class="mb-3">Totals Entries</h3>
-{% for entry in entries %}
+<!--{% for date_label , group in entries | groupby("month_day") %}
+  <h4>{{ date_label }}</h4>
+{% for block, group in entries | groupby("time_block") %}
+  <p>{{ block }}: {{ group | length }} entries</p>
 <div class="card mb-3">
+    {% for entry in group %}
     <div class="card-body">
-        <h6 class="card-subtitle mb-2 text-muted">{{ entry.timestamp }}
-         - {{ get_time_block(entry.timestamp) }}</h6>
+        <h5 class="card-subtitle mb-2 text-muted">{{ entry.timestamp }}
+         - {{ get_time_block(entry.timestamp) }}</h5>
         <p class="card-text"><strong>Trigger:</strong> {{ entry.trigger }}</p>
         {% if entry.reset_info %}
         <p class="card-text"><strong>Reset Info:</strong> {{ entry.reset_info }}</p>
@@ -26,7 +30,43 @@
         {% else %}
         <p class="card-text text-muted"><em>Not yet resolved</em></p>
         {% endif %}
-    </div>
+    <div>
+    {% endfor %}
 </div>
+{% endfor %}
+{% endfor %} -->
+
+{% for date_label, group in entries | groupby("month_day") %}
+  <!-- 1. Day Container -->
+  <div class="day-card" style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px;">
+    <h2>{{ date_label }}</h2>
+
+    <!-- 2. Loop Through Time Blocks for THIS specific day -->
+    {% for block, time_group in group | groupby("time_block") %}
+      <div class="time-block-section" style="margin-top: 15px; padding-left: 10px;">
+        
+        <!-- Displays: Afternoon (3 entries) -->
+        <h3>{{ block }} ({{ time_group | length }} entries)</h3>
+        
+        <!-- 3. Loop Through the actual entry details inside this block -->
+        <div class="details-list" style="margin-left: 15px;">
+          {% for entry in time_group %}
+            <div class="entry-detail" style="padding: 5px 0; border-bottom: 1px dashed #eee;">
+              <strong>{{ entry.timestamp.strftime('%I:%M %p') }}</strong></div>
+            <p class="entry-detail"><strong>Trigger:</strong> {{ entry.trigger }}</p>
+            {% if entry.reset_info %}
+            <p class="entry-detail" style="padding: 5px 0; border-bottom: 1px dashed #eee;"><strong>Reset Info:</strong> {{ entry.reset_info }}</p>
+            <p class="card-text"><strong>Reset Time:</strong> {{ entry.reset_time }} hour</p>
+            {% else %}
+            <p class="card-text text-muted"><em>Not yet resolved</em></p>
+            {% endif %}
+
+          {% endfor %}
+        </div> <!-- Closes details-list completely -->
+
+      </div> <!-- Closes time-block-section completely before next block starts -->
+    {% endfor %}
+
+  </div> <!-- Closes day-card completely before next day starts -->
 {% endfor %}
 {% endblock %}

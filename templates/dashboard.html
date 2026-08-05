@@ -12,7 +12,22 @@
         </div>
     </div>
 </div>
-
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Total Crash in Last Week</h5>
+                <p class="display-4">{{ weekly_crashes }}</p>
+                {% for time_block , entry in weekly_entries | groupby("weekly_time_block") %}
+                <h5 class="card-title"></h5>
+                <h6> {{ time_block }} {{ entry | length }} </h6>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+</div>
 <h3 class="mb-3">Today's Entries</h3>
 {% for entry in entries %}
 <div class="card mb-3">

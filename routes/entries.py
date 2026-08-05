@@ -18,6 +18,7 @@ today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
 today_start = today
 tomorrow_start = today + timedelta(days=1)
+last_seven_days = today - timedelta(days=7)
 
 entries_bp = Blueprint("entries", __name__)
 
@@ -57,7 +58,20 @@ def dashboard():
         Entry.timestamp >= today_start,
         Entry.timestamp < tomorrow_start
     )).scalars().all()
-    return render_template("dashboard.html", crashes_today=crashes_today, entries=todays_entries, get_time_block=get_time_block)
+    weekly_crashes = db.session.execute(
+    db.select(db.func.count()).select_from(Entry).where(
+        Entry.timestamp <= today_start,
+        Entry.timestamp > last_seven_days
+        )).scalar()
+    weekly_crashes_time_block = db.session.execute(
+    db.select(Entry).where(
+        Entry.timestamp <= today_start,
+        Entry.timestamp > last_seven_days
+        )).scalars().all()
+    print(weekly_crashes_time_block)
+    for entry in weekly_crashes_time_block:
+        entry.weekly_time_block = get_time_block(entry.timestamp)
+    return render_template("dashboard.html", crashes_today=crashes_today, weekly_entries=weekly_crashes_time_block,weekly_time_block=entry.weekly_time_block, entries=todays_entries, get_time_block=get_time_block, weekly_crashes=weekly_crashes)
 
 @entries_bp.route("/history")
 def history():
@@ -65,6 +79,9 @@ def history():
     total_days = {(entry.timestamp.year, entry.timestamp.month, entry.timestamp.day) for entry in total_entries}
     total_days_count = len(total_days)
     total_entries_count = len(total_entries)
-    return render_template("history.html", entries=total_entries, total_crashes=total_entries_count, total_days=total_days_count, get_time_block=get_time_block)
+    for entry in total_entries:
+        entry.month_day = entry.timestamp.strftime("%b %d")
+        time_block = get_time_block(entry.timestamp)
+    return render_template("history.html", time_block=time_block, entries=total_entries, total_crashes=total_entries_count, total_days=total_days_count, get_time_block=get_time_block, month_day=entry.month_day)
 
 
