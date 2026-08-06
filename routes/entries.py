@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from forms import EntryForm, ResolveForm
+from forms import EntryForm, ResolveForm, EditForm
 from models import Entry, db
 from datetime import datetime, timedelta
 
@@ -84,4 +84,17 @@ def history():
         time_block = get_time_block(entry.timestamp)
     return render_template("history.html", time_block=time_block, entries=total_entries, total_crashes=total_entries_count, total_days=total_days_count, get_time_block=get_time_block, month_day=entry.month_day)
 
+@entries_bp.route("/edit/<int:entry_id>", methods=["GET", "POST"])
+def edit(entry_id):
+    entry = db.get_or_404(Entry, entry_id)
+    edit_form = EditForm(
+        trigger=entry.trigger,
+        reset_info=entry.reset_info,
+    )
+    if edit_form.validate_on_submit():
+        entry.trigger = edit_form.trigger.data
+        entry.reset_info = edit_form.reset_info.data
+        db.session.commit()
+        return redirect(url_for("entries.history", entry_id=entry.id))
+    return render_template("log_entry.html", form=edit_form)
 

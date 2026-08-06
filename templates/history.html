@@ -54,6 +54,8 @@
             <div class="entry-detail" style="padding: 5px 0; border-bottom: 1px dashed #eee;">
               <strong>{{ entry.timestamp.strftime('%I:%M %p') }}</strong></div>
             <p class="entry-detail"><strong>Trigger:</strong> {{ entry.trigger }}</p>
+            <a href="{{ url_for('entries.edit', entry_id=entry.id) }}" class="btn btn-outline-primary btn-sm">edit trigger</a>
+
             {% if entry.reset_info %}
             <p class="entry-detail" style="padding: 5px 0; border-bottom: 1px dashed #eee;"><strong>Reset Info:</strong> {{ entry.reset_info }}</p>
             <p class="card-text"><strong>Reset Time:</strong> {{ entry.reset_time }} hour</p>
