@@ -1,33 +1,38 @@
 # ADHD Tracker
 
-A small Flask app I built to answer one question I kept asking myself: *when do I actually crash during the day, and what sets it off?*
+A small Flask app for logging focus/energy crashes — when they happen, what triggered them, and what helped after recovery. Built as a local-first, no-login v1, with an emphasis on keeping the logging step fast enough to actually use in the moment.
 
-Not a habit tracker. Not a streak app. Just a place to log the moment — the dopamine-crash, the irritation, the "I can't focus anymore" feeling — and, once I've come back from it, what actually helped.
+## Core design decision: log and resolve are separate steps
 
-## Why this exists
+The trigger for a crash is known immediately; the recovery details (what helped, how long it took) aren't known until later. Cramming both into one form meant the form couldn't honestly be filled out in real time. So the data model is split across two routes writing to the same row:
 
-I don't do well with vague self-tracking. Writing "had a rough afternoon" in a notes app never told me anything useful a week later. So this app is built around one small idea: split the *crash* from the *recovery*, because they don't happen at the same time, and pretending they do just means the form never gets filled out honestly.
+- `POST /log` — creates an `Entry` with `timestamp` + `trigger`. `reset_info` / `reset_time` are left `NULL`.
+- `POST /resolve/<id>` — fetches that same row and updates `reset_info` / `reset_time` once recovery has happened.
 
-- **Log a crash** the moment it happens — just the time and what you think triggered it. Fast, minimal, because mid-crash is not when you want to fill out a long form.
-- **Resolve it later** — once you've actually recovered — with what helped and how long it took.
-- **Look back** and see it grouped by day, by time of day, by week. Not to judge it. Just to notice.
+One `Entry` = one full crash-to-recovery cycle, populated across two requests instead of one.
 
-## What it actually does right now (v1 / v1.5)
+## Features (v1 / v1.5)
 
-- Log a crash — timestamp + trigger
-- Resolve it separately, once you've recovered
-- Dashboard: today's count, this week's count, crashes broken down by time-of-day (morning/afternoon/evening/night)
-- History: every entry, grouped by day, sub-grouped by time block
-- Edit a typo without having to live with it forever
-- Unresolved entries just... stay visible as unresolved. That's data too.
+- **Log route** (`/log`) — `EntryForm`: `DateTimeLocalField` + `StringField`, creates a row
+- **Resolve route** (`/resolve/<id>`) — `ResolveForm`, fetches via `db.get_or_404`, updates in place
+- **Edit route** — merged form covering `trigger` + `reset_info`, pre-filled via `EditForm(obj=entry)`, for fixing typos post-hoc
+- **Dashboard** (`/dashboard`):
+  - Today's crash count — `db.func.count()` with a `timestamp` range filter (`today_start <= ts < tomorrow_start`)
+  - Last 7 days' count, same range pattern extended to a week boundary
+  - Crashes aggregated by time-of-day across the week (computed via a `time_block` property on `Entry`, tallied in a dict)
+- **History** (`/history`) — entries grouped by day, then sub-grouped by time block, via nested Jinja `groupby` filters
+- Unresolved entries (`reset_info IS NULL`) are shown as-is with a link to `/resolve/<id>` — no separate "todo list" UI; open state is treated as valid data, not an error state
 
-## What it deliberately doesn't do
+## Explicitly out of scope for v1
 
-No login. No accounts. No REST API. No React. No AI analysis yet. Not because those ideas are bad — because none of them were solving a real problem I actually had while building this. I kept almost adding them anyway, and kept talking myself back down. That restraint is honestly half the project.
+No auth, no REST API (`jsonify`), no JS framework, no AI-driven analysis, no PostgreSQL. Each of these was scoped out because nothing in the current single-user, local-only usage pattern requires them yet — not a permanent decision, just not solving a problem that exists right now.
 
 ## Stack
 
-Flask, Flask-SQLAlchemy, Flask-WTF, SQLite. Bootswatch (Minty) for styling, because it was free and didn't look terrible on day one.
+- Flask, Flask-SQLAlchemy (`Mapped`/`mapped_column` style models), Flask-WTF/WTForms
+- SQLite (`instance/tracker.db`)
+- Jinja templates, Bootswatch (Minty) via CDN — no build step, no bundler
+- Blueprint-based route organization (`entries_bp`)
 
 ## Running it locally
 
@@ -40,12 +45,20 @@ pip install -r requirements.txt
 flask run
 ```
 
-No config, no `.env` secrets required for v1 — it's all local SQLite.
+No config or `.env` secrets required for v1 — SQLite file is created locally via `db.create_all()` inside an app context.
 
-## Where this is going (maybe)
+## Notable bugs fixed along the way
 
-If I keep using this for real and something genuinely starts to hurt — I can't find an old entry, I want to check it from my phone, I have enough data to actually want AI to look for patterns in it — that's when auth, an API, or analysis features earn their place. Not before.
+- A local variable named `DateTime` shadowed the SQLAlchemy `DateTime` import, causing a misleading `ArgumentError` at `create_all()` far from the actual cause
+- `.scalars()` called on a `Select` object instead of on the executed result of `db.session.execute(...)`
+- Date-range filtering (`today`/`this week`) required exact half-open boundaries (`>= start`, `< end`) rather than same-day equality checks, which don't work against full `datetime` values
+- A `@property` on the model (`time_block`) can't be assigned to directly without a setter — resolved by relying on the property for reads instead of manually setting the attribute in each route
+- A git object corruption incident (`fatal: loose object ... is corrupt`) required rebuilding `.git` from `origin/main`; recovered without data loss due to a manual backup taken before running `git reset --hard`
 
-## Why I built it this way
+## Possible next steps
 
-I have ADHD, weak working memory, and a habit of over-planning things I've never actually tried yet. This project was as much about *not* doing that as it was about the code — every feature here got questioned before it got built, and a few good ideas got shelved on purpose because I didn't actually need them yet. If you want the whole messy story of how this got built — the git disaster, the debugging, the back-and-forth with myself about scope — it's in [`adhd_tracker_journey.md`](./adhd_tracker_journey.md).
+Only if a concrete need shows up during real use: multi-device access (→ auth + API), an interactive frontend for specific views (→ JS), or trend analysis once there's enough accumulated data. None of these are planned on a timeline.
+
+## More context
+
+A longer, more narrative writeup of how this was built — decisions, dead ends, and the debugging process — is in [`adhd_tracker_journey.md`](./adhd_tracker_journey.md).
