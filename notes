@@ -26,3 +26,30 @@ You actually already worked this out correctly a few turns back — after db.ses
  What's that object called in this function? Look at your Entry(...) call — what did you name the variable?
 
 Given that, what should replace entry_id=entry_id in that redirect line?
+
+Aug 5:::
+Built:
+
+History page now groups entries by day, then by time-block within each day (nested Jinja groupby)
+Dashboard gained a "Total Crash in Last Week" stat
+Dashboard aggregates crash counts by time-block across the week (Afternoon/Evening/Night breakdown)
+Added a time_block property directly on the Entry model — computed live from timestamp, no manual per-route assignment needed
+
+Debugged along the way:
+
+Traced a silent bug where a time_block local variable was computed but never actually attached to entry objects, so grouping had nothing to work off
+Found and fixed the AttributeError: property has no setter — confirmed the @property on Entry was already solving the problem correctly; the manual assignment line was redundant and conflicting with it
+Fixed a shell quoting issue in a multi-line git commit (nested double quotes closing the string early)
+
+Decided (bigger picture, from a long planning conversation):
+
+Confirmed v1's original scope (no auth, no REST API, no React) was correct — none of those have a concrete trigger yet
+Traced back and resolved confusion about a REST API/JS/React discussion — that was from a different project (blog capstone / career-path conversation), not a decision made for the ADHD tracker
+Reaffirmed "build while learning" as your actual working style, backed by real evidence from this project (shipped features) vs. the stalled JS/React course (stuck on planning)
+Landed on a provisional v1.5 plan; 3 of 5 items done today (day-grouping, weekly count, aggregated time-block)
+
+Left for tomorrow:
+
+Bar/visual representation of the time-block breakdown (currently just numbers/text)
+"Open entries" list — unresolved crashes (reset_info still empty) shown somewhere, with a link to resolve them
+Once those two are done, v1.5 is complete — worth deciding then whether to keep extending it or actually open a real v2 conversation, backed by a concrete need rather than speculation
