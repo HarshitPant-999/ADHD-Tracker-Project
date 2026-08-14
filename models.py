@@ -17,6 +17,7 @@ class Entry(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     trigger: Mapped[str] = mapped_column(Text, nullable=False)
+    sleep_time: Mapped[int] = mapped_column(Integer, nullable=True)
     reset_info: Mapped[str] = mapped_column(Text, nullable=True)
     reset_time : Mapped[int] = mapped_column(Integer, nullable=True)
     @property

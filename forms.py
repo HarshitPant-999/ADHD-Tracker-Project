@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, URL, Optional
 class EntryForm(FlaskForm):
     timestamp = DateTimeLocalField("When did this happen?", format="%Y-%m-%dT%H:%M", validators=[DataRequired()])
     trigger = TextAreaField("What do you think caused the crash", validators=[DataRequired()])
+    sleep_time = IntegerField("Duration of today's sleep", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 class ResolveForm(FlaskForm):

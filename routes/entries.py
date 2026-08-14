@@ -28,8 +28,8 @@ def log_entry():
     if form.validate_on_submit():
         user_data = Entry(
             timestamp = form.timestamp.data,
-            trigger = form.trigger.data)
-        print(form.timestamp.data)
+            trigger = form.trigger.data,
+            sleep_time = form.sleep_time.data)
         db.session.add(user_data)
         db.session.commit()
         return redirect(url_for("entries.resolve", entry_id=user_data.id))
@@ -68,7 +68,6 @@ def dashboard():
         Entry.timestamp <= today_start,
         Entry.timestamp > last_seven_days
         )).scalars().all()
-    print(weekly_crashes_time_block)
     for entry in weekly_crashes_time_block:
         entry.weekly_time_block = get_time_block(entry.timestamp)
     return render_template("dashboard.html", crashes_today=crashes_today, weekly_entries=weekly_crashes_time_block,weekly_time_block=entry.weekly_time_block, entries=todays_entries, get_time_block=get_time_block, weekly_crashes=weekly_crashes)
