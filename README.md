@@ -62,3 +62,6 @@ Only if a concrete need shows up during real use: multi-device access (→ auth 
 ## More context
 
 A longer, more narrative writeup of how this was built — decisions, dead ends, and the debugging process — is in [`adhd_tracker_journey.md`](./adhd_tracker_journey.md).
+
+#new change:
+ added another log with crash - sleep time last night
