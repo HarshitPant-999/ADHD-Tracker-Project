@@ -2,5 +2,10 @@
 {% from "bootstrap5/form.html" import render_form %}
 
 {% block content %}
+    <button type="button" id="log-now-btn" class="btn btn-outline-secondary btn-sm mb-3">Use current time</button>
     {{ render_form(form) }}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static' , filename='js/log-now.js') }}"></script>
 {% endblock %}
